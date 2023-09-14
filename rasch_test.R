@@ -2,13 +2,19 @@ library("difR")
 library("dplyr")
 library("eRm")
 library("ggplot2")
+
 source("tests.R")
 
-set.seed(101)
+set.seed(102)
+
+# Binary matrix
 data(verbal, package = "difR")
 x0 <- as.matrix(select(verbal, !Gender & !Anger))
 gender <- verbal$Gender
 
+# A reversible Markov chain on the space of binary matrices
+# with given row and column sums. The uniform distribution is 
+# the stationary distribution of this Markov chain.
 
 rectangle_loop <- function(A) {
   r <- nrow(A)
@@ -17,6 +23,9 @@ rectangle_loop <- function(A) {
   # Sample first corner
   row_1 <- sample((1:r), 1)
   col_1 <- sample((1:c), 1)
+  
+  # If first corner is a 1, sample second corner 
+  # from available rows
   if (A[row_1, col_1] == 1){
     # Sample second corner among entries in row_1
     matched_cols <- (1:c)[A[row_1,] != A[row_1, col_1]]
@@ -41,6 +50,8 @@ rectangle_loop <- function(A) {
     if (A[row_2, col_1] == A[row_1, col_1]) {
       return(A)
     }
+  # If first corner is a 0, sample second corner from
+  # available columns
   } else {
     # Sample first corner among entries in col_1
     matched_rows <- (1:r)[A[,col_1] != A[row_1, col_1]]
@@ -70,15 +81,18 @@ rectangle_loop <- function(A) {
   }
   
   
-  
-  A[c(row_1, row_2), c(col_1, col_2)] <- 1 - A[c(row_1, row_2), c(col_1, col_2)]
+  # Flipped the selected 2 by 2 sub matrix
+  A[c(row_1, row_2), c(col_1, col_2)] <- 
+      1 - A[c(row_1, row_2), c(col_1, col_2)]
   
   return(A)
 }
 
+# Parameters for exchangeable sampler
 M <- 100
 L <- 100
 
+# Andersen's likelihood ratio test statistic
 LR_stat <- function(x){
   model <- RM(x)
   return(LRtest(model, splitcr = gender)$LR)
@@ -91,16 +105,13 @@ df <- tibble(
   Ts = result$Ts
 )
 
+# Create plot
 ggplot(df) + 
   geom_point(aes(xs, Ts),size = 0.5) + 
-  geom_point(aes(result$m_star, result$T_0), fill = "red", size = 0.5, pch = 21) +
+  geom_point(aes(result$m_star, result$T_0), fill = "red", size = 0.6, pch = 21) +
   geom_vline(aes(xintercept = result$m_star), color = "red") +
   labs(x = "Index", y = "Test statistic") +
   theme_bw()
 
-ggsave("../figures/rasch test.pdf",
-       device = "pdf",
-       width = 3.3,
-       height = 3)
 
 print(result$p_value)

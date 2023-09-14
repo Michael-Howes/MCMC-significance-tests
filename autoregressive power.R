@@ -32,9 +32,3 @@ p <- df %>%
   theme(legend.position = "bottom")
 p
 
-
-ggsave("../figures/fig power.pdf",
-       p,
-       device = "pdf",
-       width = 3.3,
-       height = 3.3)

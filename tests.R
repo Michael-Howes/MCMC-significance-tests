@@ -97,8 +97,8 @@ serial_test <- function(x0,
               m_star = m_star))
 }
 
-# Standard MC Test
 
+# Standard Monte Carlo Test
 standard_test <- function(x0, stat, sampler, M) {
   # Calculate test statistic at observed data
   # and define vector to store MC test statistics
@@ -119,43 +119,6 @@ standard_test <- function(x0, stat, sampler, M) {
               x0 = x0))
 }
 
-rectangle_loop <- function(M) {
-  r <- nrow(M)
-  c <- ncol(M)
-  
-  # Sample first corner
-  row_1 <- sample((1:r), 1)
-  col_1 <- sample((1:c), 1)
-  
-  # Sample second corner
-  matched_cols <- (1:c)[M[row_1,] != M[row_1, col_1]]
-  if (length(matched_cols) == 0) {
-    return(M)
-  }
-  if (length(matched_cols) == 1) {
-    col_2 <- matched_cols
-  } else{
-    col_2 <- sample(matched_cols, 1)
-  }
-  
-  # Sample third corner
-  matched_rows <- (1:r)[M[,col_2] != M[row_1, col_2]]
-  if (length(matched_rows) == 0){
-    return(M)
-  }
-  if (length(matched_rows) == 1) {
-    row_2 <- matched_rows
-  } else{
-    row_2 <- sample(matched_rows, 1)
-  }
-  
-  # Check if fourth corner matches
-  if (M[row_2, col_1] == M[row_1, col_1]) {
-    return(M)
-  }
-  M[c(row_1, row_2), c(col_1, col_2)] <- 1 - M[c(row_1, row_2), c(col_1, col_2)]
-  
-  return(M)
-}
+
 
 

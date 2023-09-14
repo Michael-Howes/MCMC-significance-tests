@@ -15,6 +15,8 @@ density = tibble(x = X,
 
 # 95 quantile of pi
 x_star = min(X[cumsum(pi_normed) >= 0.95])
+
+# Plot of pi
 ggplot() +
   geom_line(aes(X, pi_normed),density) +
   geom_ribbon(aes(x = x_star:100, ymin = 0, ymax = pi_normed[x_star:100]),
@@ -22,13 +24,9 @@ ggplot() +
   theme_bw() +
   labs(y = TeX(r"($\pi(x)$)"),
        x = TeX(r"($x$)"))
-ggsave("../figures/fig bimodal.pdf",
-       device = "pdf",
-       width = 3.3,
-       height = 2.8)
 
-## A reversible Markov chain with stationary distribution
-## pi
+
+## A reversible Markov chain with stationary distribution pi
 MH_step <- function(x){
   x_prime <- x
   if (rbinom(1,1,0.5) == 1){
@@ -51,25 +49,25 @@ sampler <- function() {
 }
 
 
+# Simulation parameters
+N_reps <- 1000
 
-N_reps <- 200
-x0s <- c(40,85)
-N_xs = length(x0s)
-
+# Parameters for sampler
 L <- 100
 M <- 100
 
-p_values <- matrix(nrow = N_xs*N_reps, ncol = 6)
+p_values <- matrix(nrow = N_reps, ncol = 6)
 
 colnames(p_values) <- c("parallel", "serial", "standard",
                         "L", "M", "x0")
 
 p_values[,"L"] <- L
 p_values[,"M"] <- M
-p_values[,"x0"] <- sapply(x0s, function(x){rep(x,N_reps)})
 
-for (i in 1:(N_xs*N_reps)) {
-  x0 <- p_values[i, "x0"]
+# Simulation
+for (i in 1:N_reps) {
+  x0 <- sampler()
+  p_values[i, "x0"] <- x0
   p_values[i, "parallel"] <- parallel_test(x0, 
                                            identity, 
                                            MH_step, 
@@ -100,13 +98,15 @@ df_ps <- as_tibble(p_values) %>%
                names_to = "method",
                values_to = "p_value")
 
-df_ps %>% 
-  group_by(method, x0) %>% 
-  summarize(power = mean(p_value <= 0.05),
-            mean_p = mean(p_value),
-            var_p = var(p_value)) %>% 
-  arrange(x0)
+# Count rejections
+rejections <- df_ps %>% 
+  mutate(left = (x0 <= 50),
+         rejection = (p_value <= 0.05)) %>% 
+  group_by(method) %>% 
+  summarize(power = mean(rejection),
+            power_left = mean(left*rejection),
+            power_right = mean((1-left)*rejection)) 
 
 
-
+rejections
 
