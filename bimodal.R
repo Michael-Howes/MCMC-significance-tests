@@ -52,12 +52,8 @@ sampler <- function() {
 # Simulation parameters
 N_reps <- 1000
 
-<<<<<<< HEAD
-# Parameters for sampler
-=======
-N_reps <- 1000
 
->>>>>>> 531a5a3926248d166062c1845dc1410ef7a7b101
+# Parameters for samplers
 L <- 100
 M <- 100
 
@@ -69,10 +65,8 @@ colnames(p_values) <- c("parallel", "serial", "standard",
 p_values[,"L"] <- L
 p_values[,"M"] <- M
 
-<<<<<<< HEAD
+
 # Simulation
-=======
->>>>>>> 531a5a3926248d166062c1845dc1410ef7a7b101
 for (i in 1:N_reps) {
   x0 <- sampler()
   p_values[i, "x0"] <- x0
@@ -105,9 +99,8 @@ df_ps <- as_tibble(p_values) %>%
   pivot_longer(c("parallel", "serial", "standard"),
                names_to = "method",
                values_to = "p_value")
-<<<<<<< HEAD
 
-# Count rejections
+
 rejections <- df_ps %>% 
   mutate(left = (x0 <= 50),
          rejection = (p_value <= 0.05)) %>% 
@@ -115,36 +108,4 @@ rejections <- df_ps %>%
   summarize(power = mean(rejection),
             power_left = mean(left*rejection),
             power_right = mean((1-left)*rejection)) 
-=======
-df_ps
-rejections <- df_ps %>% 
-  group_by(method) %>% 
-  summarize(power = mean(p_value <= 0.05),
-            mean_p = mean(p_value),
-            var_p = var(p_value)) 
-
-conditional_rejections <- df_ps %>% 
-  mutate(left = x0 <= 50) %>% 
-  group_by(method, left) %>% 
-  summarize(power = mean(p_value <= 0.05),
-            mean_p = mean(p_value),
-            var_p = var(p_value)) 
-
->>>>>>> 531a5a3926248d166062c1845dc1410ef7a7b101
-
-conditional_rejections
 rejections
-df_ps %>% 
-  group_by(x0, method) %>% 
-  reframe(mean_p = mean(p_value)) %>% 
-  ggplot(aes(x = x0, y = mean_p, color = method)) +
-  geom_point()
-
-<<<<<<< HEAD
-rejections
-=======
-df_ps %>% 
-  ggplot(aes(x = x0, y = p_value, color = method)) +
-  geom_point() 
->>>>>>> 531a5a3926248d166062c1845dc1410ef7a7b101
-
