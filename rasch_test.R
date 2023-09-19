@@ -5,7 +5,7 @@ library("ggplot2")
 
 source("tests.R")
 
-set.seed(102)
+set.seed(101)
 
 # Binary matrix
 data(verbal, package = "difR")
