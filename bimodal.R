@@ -14,7 +14,7 @@ density = tibble(x = X,
                  pi = pi_normed)
 
 # 95 quantile of pi
-x_star = min(X[cumsum(pi_normed) >= 0.95])
+x_star = min(X[CDF_pi >= 0.95])
 
 # Plot of pi
 ggplot() +
@@ -50,7 +50,7 @@ sampler <- function() {
 
 
 # Simulation parameters
-N_reps <- 1000
+N_reps <- 2500
 
 
 # Parameters for samplers
