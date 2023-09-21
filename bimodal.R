@@ -55,7 +55,7 @@ N_reps <- 2500
 
 # Parameters for samplers
 L <- 100
-M <- 100
+M <- 99
 
 p_values <- matrix(nrow = N_reps, ncol = 6)
 

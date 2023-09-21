@@ -3,7 +3,7 @@ library("dplyr")
 library("eRm")
 library("ggplot2")
 
-source("tests.R")
+source("~/GitHub/MCMC-significance-tests/tests.R")
 
 set.seed(101)
 
@@ -89,7 +89,7 @@ rectangle_loop <- function(A) {
 }
 
 # Parameters for exchangeable sampler
-M <- 100
+M <- 99
 L <- 100
 
 # Andersen's likelihood ratio test statistic
@@ -108,10 +108,11 @@ df <- tibble(
 # Create plot
 ggplot(df) + 
   geom_point(aes(xs, Ts),size = 0.5) + 
-  geom_point(aes(result$m_star, result$T_0), fill = "red", size = 0.6, pch = 21) +
+  geom_point(aes(result$m_star, result$T_0), fill = "red", size = 1, pch = 21) +
   geom_vline(aes(xintercept = result$m_star), color = "red") +
   labs(x = "Index", y = "Test statistic") +
   theme_bw()
 
 
+# Report p value
 print(result$p_value)
